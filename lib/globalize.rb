@@ -13,6 +13,9 @@ module Globalize
   autoload :Interpolation,   'globalize/interpolation'
 
   class << self
+    mattr_accessor :callbacks
+    self.callbacks = []
+
     def locale
       read_locale || I18n.locale
     end

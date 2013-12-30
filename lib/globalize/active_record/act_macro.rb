@@ -1,6 +1,7 @@
 module Globalize
   module ActiveRecord
     module ActMacro
+
       def translates(*attr_names)
 
         options = attr_names.extract_options!
@@ -78,6 +79,13 @@ module Globalize
         after_update :save_translations!
 
         translation_class.instance_eval %{ attr_accessible :locale }
+
+        if !Globalize.callbacks.empty?
+          # send the model instance to each globalize callback
+          Globalize.callbacks.each do |name|
+            Globalize.send name, self
+          end
+        end
       end
     end
 
