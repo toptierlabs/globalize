@@ -145,7 +145,7 @@ module Globalize
         translation_for(::Globalize.locale)
       end
 
-      def translation_for(locale, build_if_missing = true)
+      def translation_for(locale, build_if_missing = false)
         unless translation_caches[locale]
           # Fetch translations from database as those in the translation collection may be incomplete
           _translation = translations.detect{|t| t.locale.to_s == locale.to_s}
