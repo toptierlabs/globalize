@@ -19,6 +19,7 @@ module Globalize
     end
 
     def locale=(locale)
+      I18n.locale
       set_locale(locale)
     end
 

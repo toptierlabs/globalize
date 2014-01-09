@@ -111,12 +111,12 @@ module Globalize
       def set_translations(options)
         options.keys.each do |locale|
           translation = translation_for(locale) ||
-                        translations.build(:locale => locale.to_s)
+                        translations.new(:locale => locale.to_s)
 
           options[locale].each do |key, value|
             translation.send :"#{key}=", value
           end
-          translation.save
+          #translation.save
         end
         globalize.reset
       end
@@ -145,7 +145,7 @@ module Globalize
         translation_for(::Globalize.locale)
       end
 
-      def translation_for(locale, build_if_missing = false)
+      def translation_for(locale, build_if_missing = true)
         unless translation_caches[locale]
           # Fetch translations from database as those in the translation collection may be incomplete
           _translation = translations.detect{|t| t.locale.to_s == locale.to_s}

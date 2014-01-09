@@ -1,6 +1,30 @@
 module Globalize
   module ActiveRecord
     module ActMacro
+
+      def validates_globalized(*attributes)
+        if attributes.present?
+          options = attributes.extract_options!
+          translation_class.instance_eval %{
+            validates :#{attributes.join(', :')}, #{options}
+          }
+
+          # attributes.each do |attr_name|
+          #   # Detect and apply serialization.
+          #   serializer = self.serialized_attributes[attr_name.to_s]
+          #   if serializer.present?
+          #     if defined?(::ActiveRecord::Coders::YAMLColumn) &&
+          #        serializer.is_a?(::ActiveRecord::Coders::YAMLColumn)
+
+          #       serializer = serializer.object_class
+          #     end
+
+          #     translation_class.send :serialize, attr_name, serializer
+          #   end
+          # end
+        end
+      end
+
       def translates(*attr_names)
 
         options = attr_names.extract_options!
@@ -10,8 +34,13 @@ module Globalize
         attr_names -= translated_attribute_names if defined?(translated_attribute_names)
 
         if attr_names.present?
+          class_attr_names = self.new.attributes.except( :id,
+                                                         :created_at,
+                                                         :updated_at )
+                                                  .keys
           translation_class.instance_eval %{
             attr_accessible :#{attr_names.join(', :')}
+            delegate :#{class_attr_names.join(', :')}, :to => :#{table_name.singularize}
           }
 
           attr_names.each do |attr_name|
@@ -25,6 +54,7 @@ module Globalize
               end
 
               translation_class.send :serialize, attr_name, serializer
+
             end
 
             # Create accessors for the attribute.
@@ -71,7 +101,7 @@ module Globalize
         has_many :translations, :class_name  => translation_class.name,
                                 :foreign_key => options[:foreign_key],
                                 :dependent   => :destroy,
-                                :extend      => HasManyExtensions,
+                                #:extend      => HasManyExtensions,
                                 :autosave    => false
 
         after_create :save_translations!
@@ -89,6 +119,7 @@ module Globalize
         end
 
         translation_class.instance_eval %{ attr_accessible :locale }
+        translation_class.instance_eval %{ belongs_to :#{table_name.singularize} }
       end
     end
 

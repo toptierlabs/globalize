@@ -1,0 +1,4 @@
+{
+	translations_attr: { es: {title: 'main title', locale: 'en', short_title: 'short_title', description: 'description'},
+											 en: {title: 'main title', locale: 'en', short_title: 'short_title', description: 'description'},}
+}
