@@ -44,6 +44,10 @@ module Globalize
         existing_translations_by_locale = {}
         record.translations.each do |t|
           existing_translations_by_locale[t.locale.to_s] = t
+          ensure_foreign_key_for(t)
+          t.updated_at = DateTime.now
+          t.created_at = DateTime.now
+          t.save!
         end
         
         stash.reject {|locale, attrs| attrs.empty?}.each do |locale, attrs|
@@ -51,6 +55,7 @@ module Globalize
                           record.translations.build(:locale => locale.to_s)
           attrs.each { |name, value| translation[name] = value }
           ensure_foreign_key_for(translation)
+          puts translation.to_yaml
           translation.save!
         end
 
